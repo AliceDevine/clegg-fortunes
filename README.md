@@ -155,3 +155,37 @@ Event handling (in the control window) works as follows:
 5. the views process the received information using a state_changer object and
    make the neccesary changes to their state
 
+### How the State Changer works
+
+The game's state is represented by an object - check [initialise_variables.js](js/control_window/initialise_variables.js) line 27 to see all the things in the 'state' object.
+
+If a function wants to change the state of the game (eg. update the score), it has to create a "changes" object, and "publish" those changes.
+
+eg. if I wanted to update the score:
+```
+var changes = {
+   'round.points': 3
+};
+publish_changes(changes);
+```
+
+The "state changer" object then contains a function called "round", and the "publish_changes" function calls it like this:
+
+```
+state_changer.round("points",3);
+```
+
+There are two reasons we don't just directly call that:
+
+1. the publish_changes function will send the changes to the control window AND the game window
+2. it stores the last state, giving the undo/redo function
+
+The state changer object is literally just an object containing the functions like "round"
+
+```
+state_changer = {
+   finals = function(args, value) { .... },
+   round = function(args, value) { .... },
+   etc etc
+}
+```
